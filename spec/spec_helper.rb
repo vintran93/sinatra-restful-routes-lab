@@ -1,12 +1,12 @@
-ENV["SINATRA_ENV"] = "test"
+ENV["RACK_ENV"] = "test"
 
 require_relative '../config/environment'
 require 'rack/test'
 require 'capybara/rspec'
 require 'capybara/dsl'
 
-if defined?(ActiveRecord::Migrator) && ActiveRecord::Migrator.needs_migration?
-  raise 'Migrations are pending run `rake db:migrate SINATRA_ENV=test` to resolve the issue.'
+if ActiveRecord::Base.connection.migration_context.needs_migration?
+  raise 'Migrations are pending run `rake db:migrate RACK_ENV=test` to resolve the issue.'
 end
 
 RSpec.configure do |config|
@@ -28,8 +28,6 @@ RSpec.configure do |config|
 
   config.order = 'default'
 end
-
-ActiveRecord::Base.logger.level = 1
 
 def app
   Rack::Builder.parse_file('config.ru').first
